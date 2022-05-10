@@ -8,7 +8,7 @@ import pytz
 import os
 
 from discord import Client, app_commands
-from discord.ext.commands import has_permissions, MissingPermissions, CommandNotFound
+from discord.ext.commands import has_permissions, MissingPermissions, CommandNotFound, MemberConverter
 from datetime import datetime, timedelta
 from discord.ext import commands
 from discord.ext import tasks
@@ -382,13 +382,22 @@ async def purchasesLoop():
                     cursor = await db.execute('DELETE FROM nfts WHERE uniqid=?', (row[0], ))
                     cursor = await db.execute('INSERT INTO nfts VALUES (?);', (uniq_id[0], ))
                     try:
-                        member = await guild.fetch_member(d_id[0])
-                        x = datetime.now() + timedelta(seconds=604800)
-                        timestamp = x.timestamp()
-                        cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("NFT", timestamp, d_id[0]))
-                        nft = discord.utils.get(guild.roles, id=967619199289671710)
-                        await member.add_roles(nft)
-                        continue
+                        if d_id[0].isdigit():
+                            member = await guild.fetch_member(d_id[0])
+                            x = datetime.now() + timedelta(seconds=604800)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("NFT", timestamp, d_id[0]))
+                            nft = discord.utils.get(guild.roles, id=967619199289671710)
+                            await member.add_roles(nft)
+                            continue
+                        else:
+                            member = guild.get_member_named(d_id[0])
+                            x = datetime.now() + timedelta(seconds=604800)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("NFT", timestamp, d_id[0]))
+                            nft = discord.utils.get(guild.roles, id=967619199289671710)
+                            await member.add_roles(nft)
+                            continue
                     except:
                         continue
                 #CHECK FOR 1 MONTH NFT PURCHASE
@@ -397,13 +406,22 @@ async def purchasesLoop():
                     cursor = await db.execute('DELETE FROM nfts WHERE uniqid=?', (row[0], ))
                     cursor = await db.execute('INSERT INTO nfts VALUES (?);', (uniq_id[0], ))
                     try:
-                        member = await guild.fetch_member(d_id[0])
-                        x = datetime.now() + timedelta(seconds=2592000)
-                        timestamp = x.timestamp()
-                        cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("NFT", timestamp, d_id[0]))
-                        nft = discord.utils.get(guild.roles, id=967619199289671710)
-                        await member.add_roles(nft)
-                        continue
+                        if d_id[0].isdigit():
+                            member = await guild.fetch_member(d_id[0])
+                            x = datetime.now() + timedelta(seconds=2592000)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("NFT", timestamp, d_id[0]))
+                            nft = discord.utils.get(guild.roles, id=967619199289671710)
+                            await member.add_roles(nft)
+                            continue
+                        else:
+                            member = guild.get_member_named(d_id[0])
+                            x = datetime.now() + timedelta(seconds=2592000)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("NFT", timestamp, d_id[0]))
+                            nft = discord.utils.get(guild.roles, id=967619199289671710)
+                            await member.add_roles(nft)
+                            continue
                     except:
                         continue
                 #CHECK FOR LIFETIME NFT PURCHASE
@@ -412,10 +430,16 @@ async def purchasesLoop():
                     cursor = await db.execute('DELETE FROM nfts WHERE uniqid=?', (row[0], ))
                     cursor = await db.execute('INSERT INTO nfts VALUES (?);', (uniq_id[0], ))
                     try:
-                        member = await guild.fetch_member(d_id[0])
-                        nft = discord.utils.get(guild.roles, id=967619199289671710)
-                        await member.add_roles(nft)
-                        continue
+                        if d_id[0].isdigit():
+                            member = await guild.fetch_member(d_id[0])
+                            nft = discord.utils.get(guild.roles, id=967619199289671710)
+                            await member.add_roles(nft)
+                            continue
+                        else:
+                            member = guild.get_member_named(d_id[0])
+                            nft = discord.utils.get(guild.roles, id=967619199289671710)
+                            await member.add_roles(nft)
+                            continue
                     except:
                         continue
                 #CHECK FOR 1 WEEK CRYPTO PURCHASE
@@ -424,13 +448,22 @@ async def purchasesLoop():
                     cursor = await db.execute('DELETE FROM nfts WHERE uniqid=?', (row[0], ))
                     cursor = await db.execute('INSERT INTO nfts VALUES (?);', (uniq_id[0], ))
                     try:
-                        member = await guild.fetch_member(d_id[0])
-                        x = datetime.now() + timedelta(seconds=604800)
-                        timestamp = x.timestamp()
-                        cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Crypto", timestamp, d_id[0]))
-                        crypto = discord.utils.get(guild.roles, id=967619220047278150)
-                        await member.add_roles(crypto)
-                        continue
+                        if d_id[0].isdigit():
+                            member = await guild.fetch_member(d_id[0])
+                            x = datetime.now() + timedelta(seconds=604800)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Crypto", timestamp, d_id[0]))
+                            crypto = discord.utils.get(guild.roles, id=967619220047278150)
+                            await member.add_roles(crypto)
+                            continue
+                        else:
+                            member = guild.get_member_named(d_id[0])
+                            x = datetime.now() + timedelta(seconds=604800)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Crypto", timestamp, d_id[0]))
+                            crypto = discord.utils.get(guild.roles, id=967619220047278150)
+                            await member.add_roles(crypto)
+                            continue
                     except:
                         continue
                 #CHECK FOR 1 MONTH CRYPTO PURCHASE
@@ -439,13 +472,22 @@ async def purchasesLoop():
                     cursor = await db.execute('DELETE FROM nfts WHERE uniqid=?', (row[0], ))
                     cursor = await db.execute('INSERT INTO nfts VALUES (?);', (uniq_id[0], ))
                     try:
-                        member = await guild.fetch_member(d_id[0])
-                        x = datetime.now() + timedelta(seconds=2592000)
-                        timestamp = x.timestamp()
-                        cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Crypto", timestamp, d_id[0]))
-                        crypto = discord.utils.get(guild.roles, id=967619220047278150)
-                        await member.add_roles(crypto)
-                        continue
+                        if d_id[0].isdigit():
+                            member = await guild.fetch_member(d_id[0])
+                            x = datetime.now() + timedelta(seconds=2592000)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Crypto", timestamp, d_id[0]))
+                            crypto = discord.utils.get(guild.roles, id=967619220047278150)
+                            await member.add_roles(crypto)
+                            continue
+                        else:
+                            member = guild.get_member_named(d_id[0])
+                            x = datetime.now() + timedelta(seconds=2592000)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Crypto", timestamp, d_id[0]))
+                            crypto = discord.utils.get(guild.roles, id=967619220047278150)
+                            await member.add_roles(crypto)
+                            continue
                     except:
                         continue
                 #CHECK FOR LIFETIME CRYPTO PURCHASE
@@ -454,10 +496,16 @@ async def purchasesLoop():
                     cursor = await db.execute('DELETE FROM nfts WHERE uniqid=?', (row[0], ))
                     cursor = await db.execute('INSERT INTO nfts VALUES (?);', (uniq_id[0], ))
                     try:
-                        member = await guild.fetch_member(d_id[0])
-                        crypto = discord.utils.get(guild.roles, id=967619220047278150)
-                        await member.add_roles(crypto)
-                        continue
+                        if d_id[0].isdigit():
+                            member = await guild.fetch_member(d_id[0])
+                            crypto = discord.utils.get(guild.roles, id=967619220047278150)
+                            await member.add_roles(crypto)
+                            continue
+                        else:
+                            member = guild.get_member_named(d_id[0])
+                            crypto = discord.utils.get(guild.roles, id=967619220047278150)
+                            await member.add_roles(crypto)
+                            continue
                     except:
                         continue
                 #CHECK FOR 1 WEEK ARCANE PURCHASE
@@ -466,13 +514,22 @@ async def purchasesLoop():
                     cursor = await db.execute('DELETE FROM nfts WHERE uniqid=?', (row[0], ))
                     cursor = await db.execute('INSERT INTO nfts VALUES (?);', (uniq_id[0], ))
                     try:
-                        member = await guild.fetch_member(d_id[0])
-                        x = datetime.now() + timedelta(seconds=604800)
-                        timestamp = x.timestamp()
-                        cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Arcane", timestamp, d_id[0]))
-                        arcane = discord.utils.get(guild.roles, id=967619323550109786)
-                        await member.add_roles(arcane)
-                        continue
+                        if d_id[0].isdigit():
+                            member = await guild.fetch_member(d_id[0])
+                            x = datetime.now() + timedelta(seconds=604800)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Arcane", timestamp, d_id[0]))
+                            arcane = discord.utils.get(guild.roles, id=967619323550109786)
+                            await member.add_roles(arcane)
+                            continue
+                        else:
+                            member = guild.get_member_named(d_id[0])
+                            x = datetime.now() + timedelta(seconds=604800)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Arcane", timestamp, d_id[0]))
+                            arcane = discord.utils.get(guild.roles, id=967619323550109786)
+                            await member.add_roles(arcane)
+                            continue
                     except:
                         continue
                 #CHECK FOR 1 MONTH ARCANE PURCHASE
@@ -481,13 +538,22 @@ async def purchasesLoop():
                     cursor = await db.execute('DELETE FROM nfts WHERE uniqid=?', (row[0], ))
                     cursor = await db.execute('INSERT INTO nfts VALUES (?);', (uniq_id[0], ))
                     try:
-                        member = await guild.fetch_member(d_id[0])
-                        x = datetime.now() + timedelta(seconds=2592000)
-                        timestamp = x.timestamp()
-                        cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Arcane", timestamp, d_id[0]))
-                        arcane = discord.utils.get(guild.roles, id=967619323550109786)
-                        await member.add_roles(arcane)
-                        continue
+                        if d_id[0].isdigit():
+                            member = await guild.fetch_member(d_id[0])
+                            x = datetime.now() + timedelta(seconds=2592000)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Arcane", timestamp, d_id[0]))
+                            arcane = discord.utils.get(guild.roles, id=967619323550109786)
+                            await member.add_roles(arcane)
+                            continue
+                        else:
+                            member = guild.get_member_named(d_id[0])
+                            x = datetime.now() + timedelta(seconds=604800)
+                            timestamp = x.timestamp()
+                            cursor = await db.execute('INSERT INTO roles VALUES (?,?,?);', ("Arcane", timestamp, d_id[0]))
+                            arcane = discord.utils.get(guild.roles, id=967619323550109786)
+                            await member.add_roles(arcane)
+                            continue
                     except:
                         continue
                 #CHECK FOR LIFETIME ARCANE PURCHASE
@@ -496,14 +562,94 @@ async def purchasesLoop():
                     cursor = await db.execute('DELETE FROM nfts WHERE uniqid=?', (row[0], ))
                     cursor = await db.execute('INSERT INTO nfts VALUES (?);', (uniq_id[0], ))
                     try:
-                        member = await guild.fetch_member(d_id[0])
-                        arcane = discord.utils.get(guild.roles, id=967619323550109786)
-                        await member.add_roles(arcane)
-                        continue
+                        if d_id[0].isdigit():
+                            member = await guild.fetch_member(d_id[0])
+                            arcane = discord.utils.get(guild.roles, id=967619323550109786)
+                            await member.add_roles(arcane)
+                            continue
+                        else:
+                            member = guild.get_member_named(d_id[0])
+                            arcane = discord.utils.get(guild.roles, id=967619323550109786)
+                            await member.add_roles(arcane)
+                            continue
                     except:
                         continue
     except Sellix.SellixException as e:
         print(e)
+    await db.commit()
+    await db.close()
+    await asyncio.sleep(30)
+
+@tasks.loop(seconds = 30)
+async def roleLoop():
+    await client.wait_until_ready()
+    guild = client.get_guild(962895434014154853)
+    db = await aiosqlite.connect('database.db')
+    cursor = await db.execute('SELECT time_expired, user_ids, role FROM roles')
+    a = await cursor.fetchall()
+    for row in a:
+        await asyncio.sleep(1)
+        if row[0] == 'expired':
+            cursor = await db.execute('DELETE FROM roles WHERE time_expired=?', ('expired',))
+            continue
+        if row[0] <= DT.datetime.now().timestamp():
+            if row[2] == 'NFT':
+                nft = discord.utils.get(guild.roles, id=967619199289671710)
+                cursor = await db.execute('DELETE FROM roles WHERE time_expired=?', (row[0],))
+                try:
+                    if row[1].isdigit():
+                        member = guild.get_member(row[1])
+                        await member.remove_roles(nft)
+                        cursor = await db.execute('SELECT * FROM roles')
+                        logs = client.get_channel(967935877089226804)
+                        await logs.send(f"{row[1]} had their `NFT` role removed by time expiration.")
+                    else:
+                        member = guild.get_member_named(row[1])
+                        await member.remove_roles(nft)
+                        cursor = await db.execute('SELECT * FROM roles')
+                        logs = client.get_channel(967935877089226804)
+                        await logs.send(f"{row[1]} had their `NFT` role removed by time expiration.")
+                except:
+                    logs = client.get_channel(967935877089226804)
+                    await logs.send(f"{row[1]} has failed the removal of the `NFT` role.")
+            if row[2] == 'Crypto':
+                crypto = discord.utils.get(guild.roles, id=967619220047278150)
+                cursor = await db.execute('DELETE FROM roles WHERE time_expired=?', (row[0],))
+                try:
+                    if row[1].isdigit():
+                        member = guild.get_member(row[1])
+                        await member.remove_roles(crypto)
+                        cursor = await db.execute('SELECT * FROM roles')
+                        logs = client.get_channel(967935877089226804)
+                        await logs.send(f"{row[1]} had their `Crypto` role removed by time expiration.")
+                    else:
+                        member = guild.get_member_named(row[1])
+                        await member.remove_roles(crypto)
+                        cursor = await db.execute('SELECT * FROM roles')
+                        logs = client.get_channel(967935877089226804)
+                        await logs.send(f"{row[1]} had their `Crypto` role removed by time expiration.")
+                except:
+                    logs = client.get_channel(967935877089226804)
+                    await logs.send(f"{row[1]} has failed the removal of the `NFT` role.")
+            if row[2] == 'Arcane':
+                arcane = discord.utils.get(guild.roles, id=967619323550109786)
+                cursor = await db.execute('DELETE FROM roles WHERE time_expired=?', (row[0],))
+                try:
+                    if row[1].isdigit():
+                        member = guild.get_member(row[1])
+                        await member.remove_roles(arcane)
+                        cursor = await db.execute('SELECT * FROM roles')
+                        logs = client.get_channel(967935877089226804)
+                        await logs.send(f"{row[1]} had their `Arcane` role removed by time expiration.")
+                    else:
+                        member = guild.get_member_named(row[1])
+                        await member.remove_roles(arcane)
+                        cursor = await db.execute('SELECT * FROM roles')
+                        logs = client.get_channel(967935877089226804)
+                        await logs.send(f"{row[1]} had their `Arcane` role removed by time expiration.")
+                except:
+                    logs = client.get_channel(967935877089226804)
+                    await logs.send(f"{row[1]} has failed the removal of the `NFT` role.")
     await db.commit()
     await db.close()
     await asyncio.sleep(30)
@@ -718,59 +864,6 @@ async def subadd(interaction: discord.Interaction, member: discord.Member, role:
         await interaction.response.send_message(f"That role isn't available!", ephemeral=True)
     await db.commit()
     await db.close()
-
-@tasks.loop(seconds = 30)
-async def roleLoop():
-    await client.wait_until_ready()
-    guild = client.get_guild(962895434014154853)
-    db = await aiosqlite.connect('database.db')
-    cursor = await db.execute('SELECT time_expired, user_ids, role FROM roles')
-    a = await cursor.fetchall()
-    for row in a:
-        await asyncio.sleep(1)
-        if row[0] == 'expired':
-            cursor = await db.execute('DELETE FROM roles WHERE time_expired=?', ('expired',))
-            continue
-        if row[0] <= DT.datetime.now().timestamp():
-            if row[2] == 'NFT':
-                nft = discord.utils.get(guild.roles, id=967619199289671710)
-                cursor = await db.execute('DELETE FROM roles WHERE time_expired=?', (row[0],))
-                try:
-                    member = guild.get_member(row[1])
-                    await member.remove_roles(nft)
-                    cursor = await db.execute('SELECT * FROM roles')
-                    logs = client.get_channel(967935877089226804)
-                    await logs.send(f"{row[1]} had their `NFT` role removed by time expiration.")
-                except:
-                    logs = client.get_channel(967935877089226804)
-                    await logs.send(f"{row[1]} has failed the removal of the `NFT` role.")
-            if row[2] == 'Crypto':
-                crypto = discord.utils.get(guild.roles, id=967619220047278150)
-                cursor = await db.execute('DELETE FROM roles WHERE time_expired=?', (row[0],))
-                try:
-                    member = guild.get_member(row[1])
-                    await member.remove_roles(crypto)
-                    cursor = await db.execute('SELECT * FROM roles')
-                    logs = client.get_channel(967935877089226804)
-                    await logs.send(f"{row[1]} had their `Crypto` role removed by time expiration.")
-                except:
-                    logs = client.get_channel(967935877089226804)
-                    await logs.send(f"{row[1]} has failed the removal of the `NFT` role.")
-            if row[2] == 'Arcane':
-                arcane = discord.utils.get(guild.roles, id=967619323550109786)
-                cursor = await db.execute('DELETE FROM roles WHERE time_expired=?', (row[0],))
-                try:
-                    member = guild.get_member(row[1])
-                    await member.remove_roles(arcane)
-                    cursor = await db.execute('SELECT * FROM roles')
-                    logs = client.get_channel(967935877089226804)
-                    await logs.send(f"{row[1]} had their `Arcane` role removed by time expiration.")
-                except:
-                    logs = client.get_channel(967935877089226804)
-                    await logs.send(f"{row[1]} has failed the removal of the `NFT` role.")
-    await db.commit()
-    await db.close()
-    await asyncio.sleep(30)
 
 @client.event
 async def on_message(message):
