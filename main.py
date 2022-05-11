@@ -350,93 +350,6 @@ client = PersistentViewBot()
 
 apiclient = Sellix("", "signals")
 
-@client.tree.command(guild=discord.Object(id=962895434014154853), description="Add time to a subscription!")
-@app_commands.describe(member='Member to add subscription time to!')
-@app_commands.describe(role='Which role do you want to add time to?')
-@app_commands.describe(role='How long do you want to add to it?')
-async def subadd(interaction: discord.Interaction, member: discord.Member, role: discord.Role, time: str):
-    db = await aiosqlite.connect('database.db')
-    cursor = await db.execute('SELECT time_expired, user_ids, role FROM roles')
-    a = await cursor.fetchall()
-    
-    role1 = interaction.guild.get_role(967619323550109786)
-    role2 = interaction.guild.get_role(967619220047278150)
-    role3 = interaction.guild.get_role(967619199289671710)
-
-    role_variable = (role1, role2, role3)
-    if role in role_variable:
-        for row in a:
-            await asyncio.sleep(1)
-            if row[1] == member.id:
-                if row[2] == "Arcane":
-                    if role1 == role:
-                        try:
-                            time_list = re.split('(\d+)',time)
-                            if time_list[2] == "s":
-                                time_in_s = int(time_list[1])
-                            if time_list[2] == "m":
-                                time_in_s = int(time_list[1]) * 60
-                            if time_list[2] == "h":
-                                time_in_s = int(time_list[1]) * 60 * 60
-                            if time_list[2] == "d":
-                                time_in_s = int(time_list[1]) * 60 * 60 * 24
-                            oldtimestamp = row[0]
-                            x = datetime.fromtimestamp(oldtimestamp)
-                            y = x + timedelta(seconds=time_in_s)
-                            timestamp = y.timestamp()
-                            await db.execute('UPDATE roles SET time_expired=? WHERE user_ids=? AND time_expired=? AND role=?', (timestamp, member.id, oldtimestamp, "Arcane"))
-                            await interaction.response.send_message(f"I've added {time} to {member.mention}'s {role} time.", ephemeral=True)
-                        except:
-                            await interaction.response.send_message('An error occured.', ephemeral=True)
-                    else:
-                        pass
-                if row[2] == "Crypto":
-                    if role2 == role:
-                        try:
-                            time_list = re.split('(\d+)',time)
-                            if time_list[2] == "s":
-                                time_in_s = int(time_list[1])
-                            if time_list[2] == "m":
-                                time_in_s = int(time_list[1]) * 60
-                            if time_list[2] == "h":
-                                time_in_s = int(time_list[1]) * 60 * 60
-                            if time_list[2] == "d":
-                                time_in_s = int(time_list[1]) * 60 * 60 * 24
-                            oldtimestamp = row[0]
-                            x = datetime.fromtimestamp(oldtimestamp)
-                            y = x + timedelta(seconds=time_in_s)
-                            timestamp = y.timestamp()
-                            await db.execute('UPDATE roles SET time_expired=? WHERE user_ids=? AND time_expired=? AND role=?', (timestamp, member.id, oldtimestamp, "Crypto"))
-                            await interaction.response.send_message(f"I've added {time} to {member.mention}'s {role} time.", ephemeral=True)
-                        except:
-                            await interaction.response.send_message('An error occured.', ephemeral=True)
-                if row[2] == "NFT":
-                    if role3 == role:
-                        try:
-                            time_list = re.split('(\d+)',time)
-                            if time_list[2] == "s":
-                                time_in_s = int(time_list[1])
-                            if time_list[2] == "m":
-                                time_in_s = int(time_list[1]) * 60
-                            if time_list[2] == "h":
-                                time_in_s = int(time_list[1]) * 60 * 60
-                            if time_list[2] == "d":
-                                time_in_s = int(time_list[1]) * 60 * 60 * 24
-                            oldtimestamp = row[0]
-                            x = datetime.fromtimestamp(oldtimestamp)
-                            y = x + timedelta(seconds=time_in_s)
-                            timestamp = y.timestamp()
-                            await db.execute('UPDATE roles SET time_expired=? WHERE user_ids=? AND time_expired=? AND role=?', (timestamp, member.id, oldtimestamp, "NFT"))
-                            await interaction.response.send_message(f"I've added {time} to {member.mention}'s {role} time.", ephemeral=True)
-                        except:
-                            await interaction.response.send_message('An error occured.', ephemeral=True)
-                else:
-                    await interaction.response.send_message("That user doesn't have the Arcane, Crypto, or NFT role available.", ephemeral=True)
-    else:
-        await interaction.response.send_message(f"That role isn't available!", ephemeral=True)
-    await db.commit()
-    await db.close()
-
 @tasks.loop(seconds = 30)
 async def purchasesLoop():
     await client.wait_until_ready()
@@ -582,12 +495,16 @@ async def purchasesLoop():
                         if d_id[0].isdigit():
                             member = await guild.fetch_member(d_id[0])
                             nft = discord.utils.get(guild.roles, id=967619199289671710)
+                            lifetime = discord.utils.get(guild.roles, id=974061001932697600)
                             await member.add_roles(nft)
+                            await member.add_roles(lifetime)
                             continue
                         else:
                             member = guild.get_member_named(d_id[0])
                             nft = discord.utils.get(guild.roles, id=967619199289671710)
+                            lifetime = discord.utils.get(guild.roles, id=974061001932697600)
                             await member.add_roles(nft)
+                            await member.add_roles(lifetime)
                             continue
                     except:
                         continue
@@ -708,12 +625,16 @@ async def purchasesLoop():
                         if d_id[0].isdigit():
                             member = await guild.fetch_member(d_id[0])
                             crypto = discord.utils.get(guild.roles, id=967619220047278150)
+                            lifetime = discord.utils.get(guild.roles, id=974061001932697600)
                             await member.add_roles(crypto)
+                            await member.add_roles(lifetime)
                             continue
                         else:
                             member = guild.get_member_named(d_id[0])
                             crypto = discord.utils.get(guild.roles, id=967619220047278150)
+                            lifetime = discord.utils.get(guild.roles, id=974061001932697600)
                             await member.add_roles(crypto)
+                            await member.add_roles(lifetime)
                             continue
                     except:
                         continue
@@ -834,12 +755,16 @@ async def purchasesLoop():
                         if d_id[0].isdigit():
                             member = await guild.fetch_member(d_id[0])
                             arcane = discord.utils.get(guild.roles, id=967619323550109786)
+                            lifetime = discord.utils.get(guild.roles, id=974061001932697600)
                             await member.add_roles(arcane)
+                            await member.add_roles(lifetime)
                             continue
                         else:
                             member = guild.get_member_named(d_id[0])
                             arcane = discord.utils.get(guild.roles, id=967619323550109786)
+                            lifetime = discord.utils.get(guild.roles, id=974061001932697600)
                             await member.add_roles(arcane)
+                            await member.add_roles(lifetime)
                             continue
                     except:
                         continue
@@ -1047,6 +972,93 @@ async def role(interaction: discord.Interaction, member: discord.Member, role: d
         else:
             await interaction.response.send_message("I don't have that role configured yet!", ephemeral=True)
 
+@client.tree.command(guild=discord.Object(id=962895434014154853), description="Add time to a subscription!")
+@app_commands.describe(member='Member to add subscription time to!')
+@app_commands.describe(role='Which role do you want to add time to?')
+@app_commands.describe(role='How long do you want to add to it?')
+async def subadd(interaction: discord.Interaction, member: discord.Member, role: discord.Role, time: str):
+    db = await aiosqlite.connect('database.db')
+    cursor = await db.execute('SELECT time_expired, user_ids, role FROM roles')
+    a = await cursor.fetchall()
+    
+    role1 = interaction.guild.get_role(967619323550109786)
+    role2 = interaction.guild.get_role(967619220047278150)
+    role3 = interaction.guild.get_role(967619199289671710)
+
+    role_variable = (role1, role2, role3)
+    if role in role_variable:
+        for row in a:
+            await asyncio.sleep(1)
+            if row[1] == member.id:
+                if row[2] == "Arcane":
+                    if role1 == role:
+                        try:
+                            time_list = re.split('(\d+)',time)
+                            if time_list[2] == "s":
+                                time_in_s = int(time_list[1])
+                            if time_list[2] == "m":
+                                time_in_s = int(time_list[1]) * 60
+                            if time_list[2] == "h":
+                                time_in_s = int(time_list[1]) * 60 * 60
+                            if time_list[2] == "d":
+                                time_in_s = int(time_list[1]) * 60 * 60 * 24
+                            oldtimestamp = row[0]
+                            x = datetime.fromtimestamp(oldtimestamp)
+                            y = x + timedelta(seconds=time_in_s)
+                            timestamp = y.timestamp()
+                            await db.execute('UPDATE roles SET time_expired=? WHERE user_ids=? AND time_expired=? AND role=?', (timestamp, member.id, oldtimestamp, "Arcane"))
+                            await interaction.response.send_message(f"I've added {time} to {member.mention}'s {role} time.", ephemeral=True)
+                        except:
+                            await interaction.response.send_message('An error occured.', ephemeral=True)
+                    else:
+                        pass
+                if row[2] == "Crypto":
+                    if role2 == role:
+                        try:
+                            time_list = re.split('(\d+)',time)
+                            if time_list[2] == "s":
+                                time_in_s = int(time_list[1])
+                            if time_list[2] == "m":
+                                time_in_s = int(time_list[1]) * 60
+                            if time_list[2] == "h":
+                                time_in_s = int(time_list[1]) * 60 * 60
+                            if time_list[2] == "d":
+                                time_in_s = int(time_list[1]) * 60 * 60 * 24
+                            oldtimestamp = row[0]
+                            x = datetime.fromtimestamp(oldtimestamp)
+                            y = x + timedelta(seconds=time_in_s)
+                            timestamp = y.timestamp()
+                            await db.execute('UPDATE roles SET time_expired=? WHERE user_ids=? AND time_expired=? AND role=?', (timestamp, member.id, oldtimestamp, "Crypto"))
+                            await interaction.response.send_message(f"I've added {time} to {member.mention}'s {role} time.", ephemeral=True)
+                        except:
+                            await interaction.response.send_message('An error occured.', ephemeral=True)
+                if row[2] == "NFT":
+                    if role3 == role:
+                        try:
+                            time_list = re.split('(\d+)',time)
+                            if time_list[2] == "s":
+                                time_in_s = int(time_list[1])
+                            if time_list[2] == "m":
+                                time_in_s = int(time_list[1]) * 60
+                            if time_list[2] == "h":
+                                time_in_s = int(time_list[1]) * 60 * 60
+                            if time_list[2] == "d":
+                                time_in_s = int(time_list[1]) * 60 * 60 * 24
+                            oldtimestamp = row[0]
+                            x = datetime.fromtimestamp(oldtimestamp)
+                            y = x + timedelta(seconds=time_in_s)
+                            timestamp = y.timestamp()
+                            await db.execute('UPDATE roles SET time_expired=? WHERE user_ids=? AND time_expired=? AND role=?', (timestamp, member.id, oldtimestamp, "NFT"))
+                            await interaction.response.send_message(f"I've added {time} to {member.mention}'s {role} time.", ephemeral=True)
+                        except:
+                            await interaction.response.send_message('An error occured.', ephemeral=True)
+                else:
+                    await interaction.response.send_message("That user doesn't have the Arcane, Crypto, or NFT role available.", ephemeral=True)
+    else:
+        await interaction.response.send_message(f"That role isn't available!", ephemeral=True)
+    await db.commit()
+    await db.close()
+
 @client.event
 async def on_message(message):
     if message.author.id == client.user.id:
@@ -1162,25 +1174,25 @@ async def support(ctx):
 #    await a.delete()
 #    await ctx.message.delete()
 
-@client.command()
-@commands.has_permissions(administrator=True)
-async def rolesdatabase(ctx):
-    db = await aiosqlite.connect('database.db')
-    cursor = await db.execute("""
-   CREATE TABLE roles (
-        role TEXT,
-        time_expired INTEGER,
-        user_ids INTEGER
-    )""")
-    row = await cursor.fetchone()
-    rows = await cursor.fetchall()
-    await cursor.close()
-    await db.commit()
-    await db.close()
-    a = await ctx.reply('Done!')
-    await asyncio.sleep(5)
-    await a.delete()
-    await ctx.message.delete()
+#@client.command()
+#@commands.has_permissions(administrator=True)
+#async def rolesdatabase(ctx):
+#    db = await aiosqlite.connect('database.db')
+#    cursor = await db.execute("""
+#   CREATE TABLE roles (
+#        role TEXT,
+#        time_expired INTEGER,
+#        user_ids INTEGER
+#    )""")
+#    row = await cursor.fetchone()
+#    rows = await cursor.fetchall()
+#    await cursor.close()
+#    await db.commit()
+#    await db.close()
+#    a = await ctx.reply('Done!')
+#    await asyncio.sleep(5)
+#    await a.delete()
+#    await ctx.message.delete()
 
 #@client.command()
 #@commands.has_permissions(administrator=True)
@@ -1213,7 +1225,7 @@ async def deletecounter(ctx):
     await ctx.message.delete()
     await a.delete()"""
 
-@client.command()
+"""@client.command()
 @commands.is_owner()
 async def deleteroles(ctx):
     db = await aiosqlite.connect('database.db')
@@ -1223,7 +1235,7 @@ async def deleteroles(ctx):
     a = await ctx.reply('Done!')
     await asyncio.sleep(5)
     await ctx.message.delete()
-    await a.delete()
+    await a.delete()"""
 
 """@client.command()
 @commands.has_permissions(administrator=True)
