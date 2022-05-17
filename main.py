@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from discord.ext import commands
 from discord.ext import tasks
 from discord.ext.commands.errors import BadArgument
-from typing import Union
+from typing import Union, Optional
 from sellix import Sellix
 
 intents = discord.Intents.all()
@@ -353,13 +353,13 @@ apiclient = Sellix("", "signals")
 @tasks.loop(seconds = 30)
 async def purchasesLoop():
     await client.wait_until_ready()
+    db = await aiosqlite.connect('database.db')
     guild = client.get_guild(962895434014154853)
     logs = client.get_channel(967935877089226804)
     try:
         response = apiclient.get_orders()
         unid = [item['uniqid'] for item in response]
         uniq_id = unid[:1]
-        db = await aiosqlite.connect('database.db')
         cursor = await db.execute('SELECT uniqid FROM nfts')
         a = await cursor.fetchall()
         cursor2 = await db.execute('SELECT role, time_expired, user_ids FROM roles')
@@ -1059,6 +1059,51 @@ async def subadd(interaction: discord.Interaction, member: discord.Member, role:
     await db.commit()
     await db.close()
 
+@client.tree.command(guild=discord.Object(id=962895434014154853), description="Add an embed channel!")
+@app_commands.describe(channel='Which channel do you want to recieve the embed?')
+@app_commands.describe(role1='Which role do you want to ping when an embed is sent?')
+@app_commands.describe(role2='Which role do you want to ping when an embed is sent?')
+async def embedchannel(interaction: discord.Interaction, channel: discord.TextChannel, role1: Optional[discord.Role], role2: Optional[discord.Role]):
+    if role1 is None:
+        db = await aiosqlite.connect('database.db')
+        cursor = await db.execute('INSERT INTO channels VALUES (?,?,?);', (channel.id, 'null', 'null'))
+        await db.commit()
+        await db.close()
+        await interaction.response.send_message(f"I've set {channel.mention} to recieve embeds from all messages and not ping a role.", ephemeral=True)
+        return
+    if role1 is not None:
+        if role2 is None:
+            db = await aiosqlite.connect('database.db')
+            cursor = await db.execute('INSERT INTO channels VALUES (?,?,?);', (channel.id, role1.id, 'null'))
+            await db.commit()
+            await db.close()
+            await interaction.response.send_message(f"I've set {channel.mention} to recieve embeds from all messages and ping the role {role1.mention}.", ephemeral=True)
+            return
+        if role2 is not None:
+            db = await aiosqlite.connect('database.db')
+            cursor = await db.execute('INSERT INTO channels VALUES (?,?,?);', (channel.id, role1.id, role2.id))
+            await db.commit()
+            await db.close()
+            await interaction.response.send_message(f"I've set {channel.mention} to recieve embeds from all messages and ping the role {role1.mention} and {role2.mention}.", ephemeral=True)
+            return
+
+@client.tree.command(guild=discord.Object(id=962895434014154853), description="Deletes an embed channel!")
+@app_commands.describe(channel='Which embed channel do you want to remove from the system?')
+async def embedchannelremove(interaction: discord.Interaction, channel: discord.TextChannel):
+    db = await aiosqlite.connect('database.db')
+    try:
+        cursor = await db.execute('SELECT * from channels WHERE channel_ids=?', (channel.id, ))
+        a = await cursor.fetchone()
+        if a[0] is None:
+            await interaction.response.send_message(f"That channel doesn't appear to be within the list. Please be assure that {channel.mention} has been configured.", ephemeral=True)
+        else:
+            await db.execute('DELETE FROM channels WHERE channel_ids=?', (channel.id, ))
+            await interaction.response.send_message(f"I've removed {channel.mention} from the embed channel list.", ephemeral=True)
+    except:
+        await interaction.response.send_message(f"That channel doesn't appear to be within the list. Please be assure that {channel.mention} has been configured.", ephemeral=True)
+    await db.commit()
+    await db.close()
+
 @client.event
 async def on_message(message):
     if message.author.id == client.user.id:
@@ -1129,6 +1174,45 @@ async def on_message(message):
         embed.set_author(name=f"{message.author.name}", icon_url = message.author.avatar.url)
         embed.set_footer(text="discord.gg/signals")
         await message.channel.send(embed=embed)
+    db = await aiosqlite.connect('database.db')
+    try:
+        cursor = await db.execute('SELECT * from channels WHERE channel_ids=?', (message.channel.id, ))
+        a = await cursor.fetchone()
+        if message.channel.id == a[0]:
+            if a[1] != 'null':
+                if a[2] == 'null':
+                    await message.delete()
+                    await message.channel.send(f"<@&{a[1]}>", delete_after=1)
+                    embed = discord.Embed(
+                        title="",
+                        description=
+                        f"{message.content}")
+                    embed.set_author(name=f"{message.author.name}", icon_url = message.author.avatar.url)
+                    embed.set_footer(text="discord.gg/signals")
+                    await message.channel.send(embed=embed)
+                else:
+                    await message.delete()
+                    await message.channel.send(f"<@&{a[1]}> <@&{a[2]}>", delete_after=1)
+                    embed = discord.Embed(
+                        title="",
+                        description=
+                        f"{message.content}")
+                    embed.set_author(name=f"{message.author.name}", icon_url = message.author.avatar.url)
+                    embed.set_footer(text="discord.gg/signals")
+                    await message.channel.send(embed=embed)
+            else:
+                await message.delete()
+                embed = discord.Embed(
+                    title="",
+                    description=
+                    f"{message.content}")
+                embed.set_author(name=f"{message.author.name}", icon_url = message.author.avatar.url)
+                embed.set_footer(text="discord.gg/signals")
+                await message.channel.send(embed=embed)
+    except:
+        pass
+    await db.commit()
+    await db.close()
     await client.process_commands(message)
 
 @client.command()
@@ -1213,6 +1297,26 @@ async def support(ctx):
 #    await a.delete()
 #    await ctx.message.delete()
 
+#@client.command()
+#@commands.has_permissions(administrator=True)
+#async def channelsdatabase(ctx):
+#    db = await aiosqlite.connect('database.db')
+#    cursor = await db.execute("""
+#   CREATE TABLE channels (
+#        channel_ids INTEGER,
+#        role1 INTEGER,
+#        role2 INTEGER
+#    )""")
+#    row = await cursor.fetchone()
+#    rows = await cursor.fetchall()
+#    cursor = await db.execute('INSERT INTO channels VALUES (?,?,?);', (69, 'null', 'null'))
+#    await db.commit()
+#    await db.close()
+#    a = await ctx.reply('Done!')
+#    await asyncio.sleep(5)
+#    await a.delete()
+#    await ctx.message.delete()
+
 """@client.command()
 @commands.is_owner()
 async def deletecounter(ctx):
@@ -1242,6 +1346,18 @@ async def deleteroles(ctx):
 async def deletenfts(ctx):
     db = await aiosqlite.connect('database.db')
     cursor = await db.execute('DROP TABLE nfts;')
+    await db.commit()
+    await db.close()
+    a = await ctx.reply('Done!')
+    await asyncio.sleep(5)
+    await ctx.message.delete()
+    await a.delete()"""
+
+"""@client.command()
+@commands.has_permissions(administrator=True)
+async def deletechannels(ctx):
+    db = await aiosqlite.connect('database.db')
+    cursor = await db.execute('DROP TABLE channels;')
     await db.commit()
     await db.close()
     a = await ctx.reply('Done!')
